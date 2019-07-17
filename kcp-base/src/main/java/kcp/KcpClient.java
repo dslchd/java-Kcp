@@ -1,12 +1,12 @@
 package kcp;
 
 import com.backblaze.erasure.ReedSolomon;
+import com.backblaze.erasure.fec.Snmp;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.EventLoopGroup;
-import io.netty.channel.epoll.EpollEventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioDatagramChannel;
 import threadPool.thread.DisruptorExecutorPool;
@@ -24,6 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class KcpClient {
 
+
     private DisruptorExecutorPool disruptorExecutorPool;
     private Bootstrap bootstrap;
     private EventLoopGroup nioEventLoopGroup;
@@ -39,12 +40,7 @@ public class KcpClient {
                 disruptorExecutorPool.createDisruptorProcessor("disruptorExecutorPool" + i);
             }
         }
-        boolean epoll = true;
-        String os = System.getProperty("os.name").toUpperCase();
-        if (os.indexOf("WINDOWS") != -1 || os.indexOf("MAC") != -1) {
-            epoll = false;
-        }
-        nioEventLoopGroup = epoll ? new EpollEventLoopGroup(2) : new NioEventLoopGroup(2);
+        nioEventLoopGroup = new NioEventLoopGroup(Runtime.getRuntime().availableProcessors());
         bootstrap = new Bootstrap();
         bootstrap.channel(NioDatagramChannel.class);
         bootstrap.group(nioEventLoopGroup);
@@ -102,7 +98,7 @@ public class KcpClient {
         ukcpMap.put(localAddress, ukcp);
 
         ScheduleTask scheduleTask = new ScheduleTask(disruptorSingleExecutor, ukcp, ukcpMap);
-        DisruptorExecutorPool.schedule(scheduleTask, ukcp.getInterval());
+        DisruptorExecutorPool.scheduleHashedWheel(scheduleTask, ukcp.getInterval());
 
         return ukcp;
     }
@@ -128,6 +124,7 @@ public class KcpClient {
         if (nioEventLoopGroup != null) {
             nioEventLoopGroup.shutdownGracefully();
         }
+        System.out.println(Snmp.snmp);
         //System.out.println("关闭连接3");
     }
 }
