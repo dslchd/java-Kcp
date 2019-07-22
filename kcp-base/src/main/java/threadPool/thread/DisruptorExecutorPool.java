@@ -41,14 +41,6 @@ public class DisruptorExecutorPool {
 		return new Thread(r, "TimerThread" + threadNameCounter.longValue());
 	}, 1, TimeUnit.MILLISECONDS);
 
-//    private static class TimerThreadFactory implements ThreadFactory{
-//        private AtomicInteger timeThreadName=new AtomicInteger(0);
-//
-//        public Thread newThread(Runnable r) {
-//            Thread thread = new Thread(r,"TimerThread "+timeThreadName.addAndGet(1));
-//            return thread;
-//        }
-//    }
 	public static ScheduledFuture<?> scheduleWithFixedDelay(Runnable command,long milliseconds){
 		return EVENT_EXECUTORS.scheduleWithFixedDelay(command,milliseconds,milliseconds, TimeUnit.MILLISECONDS);
 	}

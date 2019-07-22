@@ -7,6 +7,7 @@ import kcp.KcpChannelConfig;
 import kcp.KcpListener;
 import kcp.KcpServer;
 import kcp.Ukcp;
+import lombok.extern.slf4j.Slf4j;
 import threadPool.thread.DisruptorExecutorPool;
 
 import java.util.Map;
@@ -18,51 +19,39 @@ import java.util.concurrent.ConcurrentHashMap;
  * Created by JinMiao
  * 2019-06-25.
  */
-public class LockStepSynchronizationServer implements KcpListener
-{
-    Map<Integer,Room> playerRooms = new ConcurrentHashMap<>();
+@Slf4j
+public class LockStepSynchronizationServer implements KcpListener {
 
-    DisruptorExecutorPool disruptorExecutorPool = new DisruptorExecutorPool();
+    private Map<Integer,Room> playerRooms = new ConcurrentHashMap<>();
+
+    private DisruptorExecutorPool disruptorExecutorPool = new DisruptorExecutorPool();
 
 
     public static void main(String[] args) {
         LockStepSynchronizationServer lockStepSynchronizationServer = new LockStepSynchronizationServer();
-//        KcpChannelConfig kcpChannelConfig = new KcpChannelConfig();
-//        kcpChannelConfig.setFastresend(2);
-//        kcpChannelConfig.setSndwnd(300);
-//        kcpChannelConfig.setRcvwnd(300);
-//        kcpChannelConfig.setMtu(500);
-//        //kcpChannelConfig.setFecDataShardCount(10);
-//        //kcpChannelConfig.setFecParityShardCount(3);
-//        kcpChannelConfig.setAckNoDelay(false);
-//        kcpChannelConfig.setInterval(40);
-//        kcpChannelConfig.setNocwnd(true);
-//        kcpChannelConfig.setCrc32Check(true);
-//        kcpChannelConfig.setTimeoutMillis(10000);
+        //config kcp params
         KcpChannelConfig kcpChannelConfig =  KcpChannelConfig.builder().fastresend(2)
         .sndwnd(300).rcvwnd(300).mtu(500).interval(400).nocwnd(true).crc32Check(true).timeoutMillis(10000).build();
         //看看config的值
-        System.out.println("KcpChannelConfig:"+kcpChannelConfig);
+        log.info("KcpChannelConfig:{}",kcpChannelConfig);
         KcpServer kcpServer = new KcpServer();
         kcpServer.init(1, lockStepSynchronizationServer, kcpChannelConfig, 10009);
-
         for (int i = 0; i < 1; i++) {
             lockStepSynchronizationServer.disruptorExecutorPool.createDisruptorProcessor("logic-"+i);
         }
-        DisruptorExecutorPool.scheduleWithFixedDelay(() -> {
-            System.out.println("每秒收包"+ (Snmp.snmp.InBytes.longValue()/1024.0/1024.0*8.0)+" M");
-            System.out.println("每秒发包"+ (Snmp.snmp.OutBytes.longValue()/1024.0/1024.0*8.0)+" M");
-            System.out.println();
-            Snmp.snmp = new Snmp();
-        },1000);
-
-
+        //打印发送与接收封包情况
+        printReceiveAndSendPacket();
     }
 
 
+    private static void printReceiveAndSendPacket(){
+        DisruptorExecutorPool.scheduleWithFixedDelay(()->{
+            log.info("每秒收包:{}",(Snmp.snmp.InBytes.longValue()/1024.0/1024.0*8.0)+" M");
+            log.info("每秒发包:{}",(Snmp.snmp.InBytes.longValue()/1024.0/1024.0*8.0)+" M");
+        },2000);
+    }
 
-
-    public synchronized void joinRoom(Player player){
+    private synchronized void joinRoom(Player player){
         Room room = null;
         for (Room value : playerRooms.values()) {
             if(value.getPlayers().size()==8)
@@ -104,10 +93,7 @@ public class LockStepSynchronizationServer implements KcpListener
         byteBuf.readBytes(byteBufAllocator);
         byteBufAllocator.readerIndex(0);
         byteBufAllocator.writerIndex(20);
-        room.getiMessageExecutor().execute(() ->{
-            player.getMessages().add(byteBufAllocator);
-                }
-        );
+        room.getiMessageExecutor().execute(() -> player.getMessages().add(byteBufAllocator));
     }
 
     @Override
@@ -119,6 +105,6 @@ public class LockStepSynchronizationServer implements KcpListener
     public void handleClose(Ukcp ukcp) {
         Player player = ukcp.user().getCache();
         playerRooms.remove(player.getId());
-        System.out.println("连接断开了"+ukcp.user().getRemoteAddress());
+        log.info("连接断开了"+ukcp.user().getRemoteAddress());
     }
 }

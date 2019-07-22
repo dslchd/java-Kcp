@@ -1,5 +1,8 @@
 package com.backblaze.erasure.fec;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.util.concurrent.atomic.LongAdder;
 
 
@@ -7,6 +10,8 @@ import java.util.concurrent.atomic.LongAdder;
  * Created by JinMiao
  * 2018/8/29.
  */
+@Data
+@NoArgsConstructor
 public class Snmp {
     // bytes sent from upper level
     public LongAdder BytesSent = new LongAdder();
@@ -61,224 +66,7 @@ public class Snmp {
     // number of data shards that's not enough for recovery
     public LongAdder FECRepeatDataShards = new LongAdder();
 
-    public LongAdder getBytesSent() {
-        return BytesSent;
-    }
-
-    public void setBytesSent(LongAdder bytesSent) {
-        BytesSent = bytesSent;
-    }
-
-    public LongAdder getBytesReceived() {
-        return BytesReceived;
-    }
-
-    public void setBytesReceived(LongAdder bytesReceived) {
-        BytesReceived = bytesReceived;
-    }
-
-    public LongAdder getMaxConn() {
-        return MaxConn;
-    }
-
-    public void setMaxConn(LongAdder maxConn) {
-        MaxConn = maxConn;
-    }
-
-    public LongAdder getActiveOpens() {
-        return ActiveOpens;
-    }
-
-    public void setActiveOpens(LongAdder activeOpens) {
-        ActiveOpens = activeOpens;
-    }
-
-    public LongAdder getPassiveOpens() {
-        return PassiveOpens;
-    }
-
-    public void setPassiveOpens(LongAdder passiveOpens) {
-        PassiveOpens = passiveOpens;
-    }
-
-    public LongAdder getCurrEstab() {
-        return CurrEstab;
-    }
-
-    public void setCurrEstab(LongAdder currEstab) {
-        CurrEstab = currEstab;
-    }
-
-    public LongAdder getInErrs() {
-        return InErrs;
-    }
-
-    public void setInErrs(LongAdder inErrs) {
-        InErrs = inErrs;
-    }
-
-    public LongAdder getInCsumErrors() {
-        return InCsumErrors;
-    }
-
-    public void setInCsumErrors(LongAdder inCsumErrors) {
-        InCsumErrors = inCsumErrors;
-    }
-
-    public LongAdder getKCPInErrors() {
-        return KCPInErrors;
-    }
-
-    public void setKCPInErrors(LongAdder KCPInErrors) {
-        this.KCPInErrors = KCPInErrors;
-    }
-
-    public LongAdder getInPkts() {
-        return InPkts;
-    }
-
-    public void setInPkts(LongAdder inPkts) {
-        InPkts = inPkts;
-    }
-
-    public LongAdder getOutPkts() {
-        return OutPkts;
-    }
-
-    public void setOutPkts(LongAdder outPkts) {
-        OutPkts = outPkts;
-    }
-
-    public LongAdder getInSegs() {
-        return InSegs;
-    }
-
-    public void setInSegs(LongAdder inSegs) {
-        InSegs = inSegs;
-    }
-
-    public LongAdder getOutSegs() {
-        return OutSegs;
-    }
-
-    public void setOutSegs(LongAdder outSegs) {
-        OutSegs = outSegs;
-    }
-
-    public LongAdder getInBytes() {
-        return InBytes;
-    }
-
-    public void setInBytes(LongAdder inBytes) {
-        InBytes = inBytes;
-    }
-
-    public LongAdder getOutBytes() {
-        return OutBytes;
-    }
-
-    public void setOutBytes(LongAdder outBytes) {
-        OutBytes = outBytes;
-    }
-
-    public LongAdder getRetransSegs() {
-        return RetransSegs;
-    }
-
-    public void setRetransSegs(LongAdder retransSegs) {
-        RetransSegs = retransSegs;
-    }
-
-    public LongAdder getFastRetransSegs() {
-        return FastRetransSegs;
-    }
-
-    public void setFastRetransSegs(LongAdder fastRetransSegs) {
-        FastRetransSegs = fastRetransSegs;
-    }
-
-    public LongAdder getEarlyRetransSegs() {
-        return EarlyRetransSegs;
-    }
-
-    public void setEarlyRetransSegs(LongAdder earlyRetransSegs) {
-        EarlyRetransSegs = earlyRetransSegs;
-    }
-
-    public LongAdder getLostSegs() {
-        return LostSegs;
-    }
-
-    public void setLostSegs(LongAdder lostSegs) {
-        LostSegs = lostSegs;
-    }
-
-    public LongAdder getRepeatSegs() {
-        return RepeatSegs;
-    }
-
-    public void setRepeatSegs(LongAdder repeatSegs) {
-        RepeatSegs = repeatSegs;
-    }
-
-    public LongAdder getFECRecovered() {
-        return FECRecovered;
-    }
-
-    public void setFECRecovered(LongAdder FECRecovered) {
-        this.FECRecovered = FECRecovered;
-    }
-
-    public LongAdder getFECErrs() {
-        return FECErrs;
-    }
-
-    public void setFECErrs(LongAdder FECErrs) {
-        this.FECErrs = FECErrs;
-    }
-
-    public LongAdder getFECDataShards() {
-        return FECDataShards;
-    }
-
-    public void setFECDataShards(LongAdder FECDataShards) {
-        this.FECDataShards = FECDataShards;
-    }
-
-    public LongAdder getFECParityShards() {
-        return FECParityShards;
-    }
-
-    public void setFECParityShards(LongAdder FECParityShards) {
-        this.FECParityShards = FECParityShards;
-    }
-
-    public LongAdder getFECShortShards() {
-        return FECShortShards;
-    }
-
-    public void setFECShortShards(LongAdder FECShortShards) {
-        this.FECShortShards = FECShortShards;
-    }
-
-    public LongAdder getFECRepeatDataShards() {
-        return FECRepeatDataShards;
-    }
-
-    public void setFECRepeatDataShards(LongAdder FECRepeatDataShards) {
-        this.FECRepeatDataShards = FECRepeatDataShards;
-    }
-
-    public static Snmp getSnmp() {
-        return snmp;
-    }
-
-    public static void setSnmp(Snmp snmp) {
-        Snmp.snmp = snmp;
-    }
-
     public static volatile Snmp snmp = new  Snmp();
-
 
     @Override
     public String toString() {
