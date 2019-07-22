@@ -22,15 +22,15 @@ public class ServerChannelHandler extends ChannelInboundHandlerAdapter {
 
     private Map<SocketAddress,Ukcp> clientMap;
 
-    private ChannelConfig channelConfig ;
+    private KcpChannelConfig kcpChannelConfig;
 
     private DisruptorExecutorPool disruptorExecutorPool;
 
     private KcpListener kcpListener;
 
-    public ServerChannelHandler(Map<SocketAddress, Ukcp> clientMap, ChannelConfig channelConfig, DisruptorExecutorPool disruptorExecutorPool, KcpListener kcpListener) {
+    public ServerChannelHandler(Map<SocketAddress, Ukcp> clientMap, KcpChannelConfig kcpChannelConfig, DisruptorExecutorPool disruptorExecutorPool, KcpListener kcpListener) {
         this.clientMap = clientMap;
-        this.channelConfig = channelConfig;
+        this.kcpChannelConfig = kcpChannelConfig;
         this.disruptorExecutorPool = disruptorExecutorPool;
         this.kcpListener = kcpListener;
     }
@@ -58,11 +58,11 @@ public class ServerChannelHandler extends ChannelInboundHandlerAdapter {
             KcpOutput kcpOutput = new KcpOutPutImp();
 
             ReedSolomon reedSolomon = null;
-            if(channelConfig.getFecDataShardCount()!=0&&channelConfig.getFecParityShardCount()!=0){
-                reedSolomon = ReedSolomon.create(channelConfig.getFecDataShardCount(),channelConfig.getFecParityShardCount());
+            if(kcpChannelConfig.getFecDataShardCount()!=0&& kcpChannelConfig.getFecParityShardCount()!=0){
+                reedSolomon = ReedSolomon.create(kcpChannelConfig.getFecDataShardCount(), kcpChannelConfig.getFecParityShardCount());
             }
 
-            Ukcp newUkcp = new Ukcp(0,kcpOutput,kcpListener,disruptorSingleExecutor,reedSolomon,channelConfig);
+            Ukcp newUkcp = new Ukcp(0,kcpOutput,kcpListener,disruptorSingleExecutor,reedSolomon, kcpChannelConfig);
             newUkcp.user(user);
 
             disruptorSingleExecutor.execute(() ->{

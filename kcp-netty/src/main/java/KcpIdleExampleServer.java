@@ -1,6 +1,6 @@
 import com.backblaze.erasure.fec.Snmp;
 import io.netty.buffer.ByteBuf;
-import kcp.ChannelConfig;
+import kcp.KcpChannelConfig;
 import kcp.KcpListener;
 import kcp.KcpServer;
 import kcp.Ukcp;
@@ -16,20 +16,20 @@ public class KcpIdleExampleServer implements KcpListener {
     public static void main(String[] args) {
 
         KcpIdleExampleServer kcpIdleExampleServer = new KcpIdleExampleServer();
-        ChannelConfig channelConfig = new ChannelConfig();
-        channelConfig.setFastresend(2);
-        channelConfig.setSndwnd(1024);
-        channelConfig.setRcvwnd(1024);
-        channelConfig.setMtu(1400);
-        //channelConfig.setFecDataShardCount(10);
-        //channelConfig.setFecParityShardCount(3);
-        channelConfig.setAckNoDelay(false);
-        channelConfig.setInterval(40);
-        channelConfig.setNocwnd(true);
-        channelConfig.setCrc32Check(true);
-        //channelConfig.setTimeoutMillis(10000);
+        KcpChannelConfig kcpChannelConfig = new KcpChannelConfig();
+        kcpChannelConfig.setFastresend(2);
+        kcpChannelConfig.setSndwnd(1024);
+        kcpChannelConfig.setRcvwnd(1024);
+        kcpChannelConfig.setMtu(1400);
+        //kcpChannelConfig.setFecDataShardCount(10);
+        //kcpChannelConfig.setFecParityShardCount(3);
+        kcpChannelConfig.setAckNoDelay(false);
+        kcpChannelConfig.setInterval(40);
+        kcpChannelConfig.setNocwnd(true);
+        kcpChannelConfig.setCrc32Check(true);
+        //kcpChannelConfig.setTimeoutMillis(10000);
         KcpServer kcpServer = new KcpServer();
-        kcpServer.init(Runtime.getRuntime().availableProcessors(), kcpIdleExampleServer, channelConfig, 10020);
+        kcpServer.init(Runtime.getRuntime().availableProcessors(), kcpIdleExampleServer, kcpChannelConfig, 10020);
     }
 
     private AtomicInteger atomicInteger = new AtomicInteger();

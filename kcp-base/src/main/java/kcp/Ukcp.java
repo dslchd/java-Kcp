@@ -67,7 +67,7 @@ public class Ukcp{
      * @param conv   conv of kcp
      * @param output output for kcp
      */
-    public Ukcp(int conv, KcpOutput output, KcpListener kcpListener, IMessageExecutor disruptorSingleExecutor,ReedSolomon reedSolomon,ChannelConfig channelConfig) {
+    public Ukcp(int conv, KcpOutput output, KcpListener kcpListener, IMessageExecutor disruptorSingleExecutor, ReedSolomon reedSolomon, KcpChannelConfig kcpChannelConfig) {
         this.kcp = new Kcp(conv, output);
         this.active = true;
         this.kcpListener = kcpListener;
@@ -81,7 +81,7 @@ public class Ukcp{
 
 
         //init crc32
-        if(channelConfig.isCrc32Check()){
+        if(kcpChannelConfig.isCrc32Check()){
             this.crc32Check = true;
             KcpOutput kcpOutput = kcp.getOutput();
             kcpOutput = new Crc32OutPut(kcpOutput,headerSize);
@@ -92,33 +92,33 @@ public class Ukcp{
         //init fec
         if (reedSolomon != null) {
             KcpOutput kcpOutput = kcp.getOutput();
-            fecEncode = new FecEncode(headerSize, reedSolomon,channelConfig.getMtu());
-            fecDecode = new FecDecode(3 * reedSolomon.getTotalShardCount(), reedSolomon,channelConfig.getMtu());
+            fecEncode = new FecEncode(headerSize, reedSolomon, kcpChannelConfig.getMtu());
+            fecDecode = new FecDecode(3 * reedSolomon.getTotalShardCount(), reedSolomon, kcpChannelConfig.getMtu());
             kcpOutput = new FecOutPut(kcpOutput, fecEncode);
             kcp.setOutput(kcpOutput);
             headerSize+= Fec.fecHeaderSizePlus2;
         }
 
         kcp.setReserved(headerSize);
-        intKcpConfig(channelConfig);
+        intKcpConfig(kcpChannelConfig);
     }
 
 
-    private void intKcpConfig(ChannelConfig channelConfig){
-        kcp.setNodelay(channelConfig.isNodelay());
-        kcp.setInterval(channelConfig.getInterval());
-        kcp.setFastresend(channelConfig.getFastresend());
-        kcp.setNocwnd(channelConfig.isNocwnd());
+    private void intKcpConfig(KcpChannelConfig kcpChannelConfig){
+        kcp.setNodelay(kcpChannelConfig.isNodelay());
+        kcp.setInterval(kcpChannelConfig.getInterval());
+        kcp.setFastresend(kcpChannelConfig.getFastresend());
+        kcp.setNocwnd(kcpChannelConfig.isNocwnd());
 
-        kcp.setSndWnd(channelConfig.getSndwnd());
-        kcp.setRcvWnd(channelConfig.getRcvwnd());
-        kcp.setMtu(channelConfig.getMtu());
-        kcp.setRxMinrto(channelConfig.getMinRto());
-        kcp.setStream(channelConfig.isStream());
-        kcp.setAckNoDelay(channelConfig.isAckNoDelay());
-        kcp.setAutoSetConv(channelConfig.isAutoSetConv());
-        setFastFlush(channelConfig.isFastFlush());
-        setTimeoutMillis(channelConfig.getTimeoutMillis());
+        kcp.setSndWnd(kcpChannelConfig.getSndwnd());
+        kcp.setRcvWnd(kcpChannelConfig.getRcvwnd());
+        kcp.setMtu(kcpChannelConfig.getMtu());
+        kcp.setRxMinrto(kcpChannelConfig.getMinRto());
+        kcp.setStream(kcpChannelConfig.isStream());
+        kcp.setAckNoDelay(kcpChannelConfig.isAckNoDelay());
+        kcp.setAutoSetConv(kcpChannelConfig.isAutoSetConv());
+        setFastFlush(kcpChannelConfig.isFastFlush());
+        setTimeoutMillis(kcpChannelConfig.getTimeoutMillis());
     }
 
 

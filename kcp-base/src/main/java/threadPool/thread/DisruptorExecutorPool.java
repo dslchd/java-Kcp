@@ -3,6 +3,7 @@ package threadPool.thread;
 import io.netty.channel.DefaultEventLoop;
 import io.netty.util.HashedWheelTimer;
 import io.netty.util.TimerTask;
+import lombok.extern.java.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,15 +13,15 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.LongAdder;
 
 /**
  * 基于disruptor的线程池
  * @author jinmiao
  * 2014-9-12 上午9:51:09
  */
-public class DisruptorExecutorPool
-{
-	private static final Logger log = LoggerFactory.getLogger(DisruptorExecutorPool.class);
+@Log
+public class DisruptorExecutorPool {
 
 	protected List<IMessageExecutor> executor = new Vector<>();
 	
@@ -31,18 +32,23 @@ public class DisruptorExecutorPool
     private static final DefaultEventLoop EVENT_EXECUTORS = new DefaultEventLoop();
 
 
-    private static final HashedWheelTimer hashedWheelTimer = new HashedWheelTimer(new TimerThreadFactory(),1,TimeUnit.MILLISECONDS);
+    //private static final HashedWheelTimer hashedWheelTimer = new HashedWheelTimer(new TimerThreadFactory(),1,TimeUnit.MILLISECONDS);
 
-    /**定时器线程工厂**/
-    private static class TimerThreadFactory implements ThreadFactory
-    {
-        private AtomicInteger timeThreadName=new AtomicInteger(0);
+	/**定时器线程工厂**/
+	private static final HashedWheelTimer hashedWheelTimer = new HashedWheelTimer((r) -> {
+		LongAdder threadNameCounter = new LongAdder();
+		threadNameCounter.increment();
+		return new Thread(r, "TimerThread" + threadNameCounter.longValue());
+	}, 1, TimeUnit.MILLISECONDS);
 
-        public Thread newThread(Runnable r) {
-            Thread thread = new Thread(r,"TimerThread "+timeThreadName.addAndGet(1));
-            return thread;
-        }
-    }
+//    private static class TimerThreadFactory implements ThreadFactory{
+//        private AtomicInteger timeThreadName=new AtomicInteger(0);
+//
+//        public Thread newThread(Runnable r) {
+//            Thread thread = new Thread(r,"TimerThread "+timeThreadName.addAndGet(1));
+//            return thread;
+//        }
+//    }
 	public static ScheduledFuture<?> scheduleWithFixedDelay(Runnable command,long milliseconds){
 		return EVENT_EXECUTORS.scheduleWithFixedDelay(command,milliseconds,milliseconds, TimeUnit.MILLISECONDS);
 	}
@@ -54,8 +60,8 @@ public class DisruptorExecutorPool
 
 	/**
 	 * 创造一个线程对象
-	 * @param threadName
-	 * @return
+	 * @param threadName 线程名
+	 * @return {@link IMessageExecutor}
 	 */
 	public IMessageExecutor createDisruptorProcessor(String threadName)
 	{

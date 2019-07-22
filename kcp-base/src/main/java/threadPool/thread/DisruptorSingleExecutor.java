@@ -1,8 +1,6 @@
 package threadPool.thread;
 
-import com.lmax.disruptor.BlockingWaitStrategy;
 import com.lmax.disruptor.RingBuffer;
-import com.lmax.disruptor.WaitStrategy;
 import com.lmax.disruptor.dsl.Disruptor;
 import threadPool.task.ITask;
 
@@ -16,20 +14,22 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class DisruptorSingleExecutor implements IMessageExecutor {
 
-	//65536条消息
-	int ringBufferSize = 2<<15;
+	/**
+	 * RingBuffer queue size
+	 */
+	private static final int RING_BUFFER_SIZE = 65536;
 	
-	private WaitStrategy strategy = new BlockingWaitStrategy();
+	// private WaitStrategy strategy = new BlockingWaitStrategy();
 	
-	private Disruptor<DistriptorHandler> disruptor = null;
+	private Disruptor<DisruptorHandler> disruptor = null;
 
-	private RingBuffer<DistriptorHandler> buffer = null;
+	private RingBuffer<DisruptorHandler> buffer = null;
 	
-	private DistriptorEventFactory eventFactory = new DistriptorEventFactory();
+	private DisruptorEventFactory eventFactory = new DisruptorEventFactory();
 	
-	private static final DistriptorEventHandler handler = new DistriptorEventHandler();
+	private static final DisruptorEventHandler handler = new DisruptorEventHandler();
 	
-	private AtomicBoolean istop = new AtomicBoolean();
+	private AtomicBoolean isTop = new AtomicBoolean();
 	
 
 	/**线程名字**/
@@ -38,17 +38,16 @@ public class DisruptorSingleExecutor implements IMessageExecutor {
 	private DisruptorThread currentThread;
 
 
-	public DisruptorSingleExecutor(String threadName)
-	{
+	public DisruptorSingleExecutor(String threadName){
 		this.threadName = threadName;
 	}
 	
 
 	@SuppressWarnings("unchecked")
 	public void start() {
-		LoopThreadfactory loopThreadfactory = new LoopThreadfactory(this);
-//		disruptor = new Disruptor<DistriptorHandler>(eventFactory, ringBufferSize, executor, ProducerType.MULTI, strategy);
-		disruptor = new Disruptor<>(eventFactory, ringBufferSize, loopThreadfactory);
+		LoopThreadFactory loopThreadfactory = new LoopThreadFactory(this);
+//		disruptor = new Disruptor<DisruptorHandler>(eventFactory, ringBufferSize, executor, ProducerType.MULTI, strategy);
+		disruptor = new Disruptor<>(eventFactory, RING_BUFFER_SIZE, loopThreadfactory);
 		buffer = disruptor.getRingBuffer();
 		disruptor.handleEventsWith(DisruptorSingleExecutor.handler);
 		disruptor.start();
@@ -57,10 +56,10 @@ public class DisruptorSingleExecutor implements IMessageExecutor {
 
 	
 	/**主线程工厂**/
-	private class LoopThreadfactory implements ThreadFactory {
+	private class LoopThreadFactory implements ThreadFactory {
 		IMessageExecutor iMessageExecutor;
 
-		public LoopThreadfactory(IMessageExecutor iMessageExecutor) {
+		public LoopThreadFactory(IMessageExecutor iMessageExecutor) {
 			this.iMessageExecutor = iMessageExecutor;
 		}
 
@@ -78,11 +77,11 @@ public class DisruptorSingleExecutor implements IMessageExecutor {
 
 
 	public void stop() {
-		if(istop.get())
+		if(isTop.get())
 			return;
 		disruptor.shutdown();
 
-		istop.set(true);
+		isTop.set(true);
 	}
 
 
@@ -103,8 +102,8 @@ public class DisruptorSingleExecutor implements IMessageExecutor {
 
 	}
 
-	public AtomicBoolean getIstop() {
-		return istop;
+	public AtomicBoolean getIsTop() {
+		return isTop;
 	}
 	
 
@@ -124,7 +123,7 @@ public class DisruptorSingleExecutor implements IMessageExecutor {
 //			System.out.println("没有容量了");
 //		}
 		long next = buffer.next();
-		DistriptorHandler testEvent = buffer.get(next);
+		DisruptorHandler testEvent = buffer.get(next);
 		testEvent.setTask(iTask);
 		buffer.publish(next);
 	}

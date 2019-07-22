@@ -1,6 +1,6 @@
 import com.backblaze.erasure.fec.Snmp;
 import io.netty.buffer.ByteBuf;
-import kcp.ChannelConfig;
+import kcp.KcpChannelConfig;
 import kcp.KcpListener;
 import kcp.KcpServer;
 import kcp.Ukcp;
@@ -16,21 +16,21 @@ public class KcpRttExampleServer implements KcpListener {
 
         KcpRttExampleServer kcpRttExampleServer = new KcpRttExampleServer();
 
-        ChannelConfig channelConfig = new ChannelConfig();
-        channelConfig.setFastresend(2);
-        channelConfig.setSndwnd(512);
-        channelConfig.setRcvwnd(512);
-        channelConfig.setMtu(1400);
-        //channelConfig.setFecDataShardCount(10);
-        //channelConfig.setFecParityShardCount(3);
-        channelConfig.setAckNoDelay(false);
-        channelConfig.setInterval(40);
-        channelConfig.setNocwnd(true);
-        channelConfig.setCrc32Check(true);
-        channelConfig.setTimeoutMillis(10000);
-        channelConfig.setAutoSetConv(true);
+        KcpChannelConfig kcpChannelConfig = new KcpChannelConfig();
+        kcpChannelConfig.setFastresend(2);
+        kcpChannelConfig.setSndwnd(512);
+        kcpChannelConfig.setRcvwnd(512);
+        kcpChannelConfig.setMtu(1400);
+        //kcpChannelConfig.setFecDataShardCount(10);
+        //kcpChannelConfig.setFecParityShardCount(3);
+        kcpChannelConfig.setAckNoDelay(false);
+        kcpChannelConfig.setInterval(40);
+        kcpChannelConfig.setNocwnd(true);
+        kcpChannelConfig.setCrc32Check(true);
+        kcpChannelConfig.setTimeoutMillis(10000);
+        kcpChannelConfig.setAutoSetConv(true);
         KcpServer kcpServer = new KcpServer();
-        kcpServer.init(Runtime.getRuntime().availableProcessors(), kcpRttExampleServer,channelConfig,10003);
+        kcpServer.init(Runtime.getRuntime().availableProcessors(), kcpRttExampleServer, kcpChannelConfig,10003);
     }
 
 

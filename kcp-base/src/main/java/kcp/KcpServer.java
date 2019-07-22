@@ -31,16 +31,16 @@ public class KcpServer {
     private Map<SocketAddress,Ukcp> clientMap = new ConcurrentHashMap<>();
 
 
-    public void init(int workSize, KcpListener kcpListener, ChannelConfig channelConfig, int...ports){
+    public void init(int workSize, KcpListener kcpListener, KcpChannelConfig kcpChannelConfig, int...ports){
         DisruptorExecutorPool disruptorExecutorPool = new DisruptorExecutorPool();
         for (int i = 0; i < workSize; i++) {
             disruptorExecutorPool.createDisruptorProcessor("disruptorExecutorPool"+i);
         }
-        init(disruptorExecutorPool,kcpListener,channelConfig,ports);
+        init(disruptorExecutorPool,kcpListener, kcpChannelConfig,ports);
     }
 
 
-    public void init(DisruptorExecutorPool disruptorExecutorPool, KcpListener kcpListener, ChannelConfig channelConfig, int...ports){
+    public void init(DisruptorExecutorPool disruptorExecutorPool, KcpListener kcpListener, KcpChannelConfig kcpChannelConfig, int...ports){
         boolean epoll = Epoll.isAvailable();
         this.disruptorExecutorPool = disruptorExecutorPool;
         bootstrap = new Bootstrap();
@@ -60,7 +60,7 @@ public class KcpServer {
         {
             @Override
             protected void initChannel(Channel ch) {
-                ServerChannelHandler serverChannelHandler = new ServerChannelHandler(clientMap,channelConfig,disruptorExecutorPool,kcpListener);
+                ServerChannelHandler serverChannelHandler = new ServerChannelHandler(clientMap, kcpChannelConfig,disruptorExecutorPool,kcpListener);
                 ChannelPipeline cp = ch.pipeline();
                 cp.addLast(serverChannelHandler);
             }

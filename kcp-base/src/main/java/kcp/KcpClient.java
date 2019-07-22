@@ -69,7 +69,7 @@ public class KcpClient {
         init();
     }
 
-    public Ukcp connect(InetSocketAddress remoteAddress, ChannelConfig channelConfig, KcpListener kcpListener) {
+    public Ukcp connect(InetSocketAddress remoteAddress, KcpChannelConfig kcpChannelConfig, KcpListener kcpListener) {
         ChannelFuture channelFuture = bootstrap.bind(new InetSocketAddress(0));
         ChannelFuture sync = channelFuture.syncUninterruptibly();
         NioDatagramChannel channel = (NioDatagramChannel) sync.channel();
@@ -80,11 +80,11 @@ public class KcpClient {
         KcpOutput kcpOutput = new KcpOutPutImp();
 
         ReedSolomon reedSolomon = null;
-        if (channelConfig.getFecDataShardCount() != 0 && channelConfig.getFecParityShardCount() != 0) {
-            reedSolomon = ReedSolomon.create(channelConfig.getFecDataShardCount(), channelConfig.getFecParityShardCount());
+        if (kcpChannelConfig.getFecDataShardCount() != 0 && kcpChannelConfig.getFecParityShardCount() != 0) {
+            reedSolomon = ReedSolomon.create(kcpChannelConfig.getFecDataShardCount(), kcpChannelConfig.getFecParityShardCount());
         }
 
-        Ukcp ukcp = new Ukcp(0, kcpOutput, kcpListener, disruptorSingleExecutor, reedSolomon,channelConfig);
+        Ukcp ukcp = new Ukcp(0, kcpOutput, kcpListener, disruptorSingleExecutor, reedSolomon, kcpChannelConfig);
         ukcp.user(user);
 
         disruptorSingleExecutor.execute(() -> {

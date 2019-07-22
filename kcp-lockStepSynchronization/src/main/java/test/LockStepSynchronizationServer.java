@@ -3,7 +3,7 @@ package test;
 import com.backblaze.erasure.fec.Snmp;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
-import kcp.ChannelConfig;
+import kcp.KcpChannelConfig;
 import kcp.KcpListener;
 import kcp.KcpServer;
 import kcp.Ukcp;
@@ -27,20 +27,24 @@ public class LockStepSynchronizationServer implements KcpListener
 
     public static void main(String[] args) {
         LockStepSynchronizationServer lockStepSynchronizationServer = new LockStepSynchronizationServer();
-        ChannelConfig channelConfig = new ChannelConfig();
-        channelConfig.setFastresend(2);
-        channelConfig.setSndwnd(300);
-        channelConfig.setRcvwnd(300);
-        channelConfig.setMtu(500);
-        //channelConfig.setFecDataShardCount(10);
-        //channelConfig.setFecParityShardCount(3);
-        channelConfig.setAckNoDelay(false);
-        channelConfig.setInterval(40);
-        channelConfig.setNocwnd(true);
-        channelConfig.setCrc32Check(true);
-        channelConfig.setTimeoutMillis(10000);
+//        KcpChannelConfig kcpChannelConfig = new KcpChannelConfig();
+//        kcpChannelConfig.setFastresend(2);
+//        kcpChannelConfig.setSndwnd(300);
+//        kcpChannelConfig.setRcvwnd(300);
+//        kcpChannelConfig.setMtu(500);
+//        //kcpChannelConfig.setFecDataShardCount(10);
+//        //kcpChannelConfig.setFecParityShardCount(3);
+//        kcpChannelConfig.setAckNoDelay(false);
+//        kcpChannelConfig.setInterval(40);
+//        kcpChannelConfig.setNocwnd(true);
+//        kcpChannelConfig.setCrc32Check(true);
+//        kcpChannelConfig.setTimeoutMillis(10000);
+        KcpChannelConfig kcpChannelConfig =  KcpChannelConfig.builder().fastresend(2)
+        .sndwnd(300).rcvwnd(300).mtu(500).interval(400).nocwnd(true).crc32Check(true).timeoutMillis(10000).build();
+        //看看config的值
+        System.out.println("KcpChannelConfig:"+kcpChannelConfig);
         KcpServer kcpServer = new KcpServer();
-        kcpServer.init(1, lockStepSynchronizationServer, channelConfig, 10009);
+        kcpServer.init(1, lockStepSynchronizationServer, kcpChannelConfig, 10009);
 
         for (int i = 0; i < 1; i++) {
             lockStepSynchronizationServer.disruptorExecutorPool.createDisruptorProcessor("logic-"+i);

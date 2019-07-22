@@ -1,6 +1,6 @@
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.UnpooledByteBufAllocator;
-import kcp.ChannelConfig;
+import kcp.KcpChannelConfig;
 import kcp.KcpClient;
 import kcp.KcpListener;
 import kcp.Ukcp;
@@ -17,18 +17,18 @@ public class KcpIdleExampleClient implements KcpListener {
         KcpClient kcpClient = new KcpClient();
         kcpClient.init(Runtime.getRuntime().availableProcessors());
 
-        ChannelConfig channelConfig = new ChannelConfig();
-        channelConfig.setFastresend(2);
-        channelConfig.setSndwnd(1024);
-        channelConfig.setRcvwnd(1024);
-        channelConfig.setMtu(1400);
-        //channelConfig.setFecDataShardCount(10);
-        //channelConfig.setFecParityShardCount(3);
-        channelConfig.setAckNoDelay(false);
-        channelConfig.setInterval(40);
-        channelConfig.setNocwnd(true);
-        channelConfig.setCrc32Check(true);
-        //channelConfig.setTimeoutMillis(10000);
+        KcpChannelConfig kcpChannelConfig = new KcpChannelConfig();
+        kcpChannelConfig.setFastresend(2);
+        kcpChannelConfig.setSndwnd(1024);
+        kcpChannelConfig.setRcvwnd(1024);
+        kcpChannelConfig.setMtu(1400);
+        //kcpChannelConfig.setFecDataShardCount(10);
+        //kcpChannelConfig.setFecParityShardCount(3);
+        kcpChannelConfig.setAckNoDelay(false);
+        kcpChannelConfig.setInterval(40);
+        kcpChannelConfig.setNocwnd(true);
+        kcpChannelConfig.setCrc32Check(true);
+        //kcpChannelConfig.setTimeoutMillis(10000);
 
         for (int i = 0; i < 3000; i++) {
             if(i%1000==0){
@@ -39,7 +39,7 @@ public class KcpIdleExampleClient implements KcpListener {
                 }
             }
             KcpIdleExampleClient kcpIdleExampleClient = new KcpIdleExampleClient();
-            kcpClient.connect(new InetSocketAddress("127.0.0.1", 10020), channelConfig, kcpIdleExampleClient);
+            kcpClient.connect(new InetSocketAddress("127.0.0.1", 10020), kcpChannelConfig, kcpIdleExampleClient);
         }
 
     }

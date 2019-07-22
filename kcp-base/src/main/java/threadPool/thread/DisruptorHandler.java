@@ -4,10 +4,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import threadPool.task.ITask;
 
-public class DistriptorHandler
+public class DisruptorHandler
 {
 
-	protected static final Logger logger = LoggerFactory.getLogger(DistriptorHandler.class);
+	protected static final Logger logger = LoggerFactory.getLogger(DisruptorHandler.class);
 	private ITask task;
 
 

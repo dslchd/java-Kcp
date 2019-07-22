@@ -6,6 +6,7 @@ import threadPool.task.ITask;
  * 消息处理器
  */
 public interface IMessageExecutor{
+
 	/**
 	 * 启动消息处理器
 	 */
