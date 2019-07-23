@@ -52,7 +52,7 @@ public class KcpClient {
             }
         });
 
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> stop()));
+        Runtime.getRuntime().addShutdownHook(new Thread(this::stop));
     }
 
     public void init(DisruptorExecutorPool disruptorExecutorPool) {

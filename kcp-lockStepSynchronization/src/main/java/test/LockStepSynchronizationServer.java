@@ -33,7 +33,7 @@ public class LockStepSynchronizationServer implements KcpListener {
         KcpChannelConfig kcpChannelConfig =  KcpChannelConfig.builder().fastresend(2)
         .sndwnd(300).rcvwnd(300).mtu(500).interval(400).nocwnd(true).crc32Check(true).timeoutMillis(10000).build();
         //看看config的值
-        log.info("KcpChannelConfig:{}",kcpChannelConfig);
+        log.debug("KcpChannelConfig:{}",kcpChannelConfig);
         KcpServer kcpServer = new KcpServer();
         kcpServer.init(1, lockStepSynchronizationServer, kcpChannelConfig, 10009);
         for (int i = 0; i < 1; i++) {
@@ -47,7 +47,8 @@ public class LockStepSynchronizationServer implements KcpListener {
     private static void printReceiveAndSendPacket(){
         DisruptorExecutorPool.scheduleWithFixedDelay(()->{
             log.info("每秒收包:{}",(Snmp.snmp.InBytes.longValue()/1024.0/1024.0*8.0)+" M");
-            log.info("每秒发包:{}",(Snmp.snmp.InBytes.longValue()/1024.0/1024.0*8.0)+" M");
+            log.info("每秒发包:{}",(Snmp.snmp.OutBytes.longValue()/1024.0/1024.0*8.0)+" M");
+            Snmp.snmp=new Snmp();
         },2000);
     }
 
